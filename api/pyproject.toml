@@ -1,0 +1,7 @@
+[project]
+name = "talent-forge-api"
+version = "0.1.0"
+description = "MVP placeholder for analyze/rewrite endpoints."
+authors = [{name = "Talent Forge"}]
+dependencies = []
+# TODO: add FastAPI, Uvicorn, and testing dependencies.

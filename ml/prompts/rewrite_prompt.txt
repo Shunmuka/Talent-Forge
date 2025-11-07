@@ -1,0 +1,8 @@
+Resume:
+{{resume_text}}
+
+Job Description:
+{{job_description_text}}
+
+Focus:
+{{rewrite_focus}}

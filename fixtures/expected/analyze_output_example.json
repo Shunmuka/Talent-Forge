@@ -1,0 +1,12 @@
+{
+  "score": 72,
+  "gaps": [
+    {"skill": "GraphQL", "reason": "TODO: fill gap reasoning"}
+  ],
+  "evidence": [
+    {"resumeText": "Sample resume text", "jdText": "Sample JD text"}
+  ],
+  "bullets": [
+    "TODO: example bullet summary"
+  ]
+}

@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: talent_forge
+      POSTGRES_USER: tf_user
+      POSTGRES_PASSWORD: tf_pass
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    # TODO: configure initialization scripts
+  api:
+    image: todo/talent-forge-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://tf_user:tf_pass@postgres:5432/talent_forge}
+    depends_on:
+      - postgres
+    # TODO: fill in command
+  frontend:
+    image: todo/talent-forge-frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api}
+    depends_on:
+      - api
+    # TODO: fill in command
+
+volumes:
+  db_data:

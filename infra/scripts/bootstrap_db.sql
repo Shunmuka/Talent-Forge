@@ -1,0 +1,2 @@
+-- Placeholder bootstrap script for local Postgres.
+-- TODO: add schemas, seed data, and roles.

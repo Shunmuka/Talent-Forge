@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "target": "es2019",
+    "strict": false
+  },
+  "include": ["src"]
+}

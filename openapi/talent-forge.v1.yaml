@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: Talent Forge API
+  version: 0.0.1
+  description: MVP contract for resume analysis and rewrite flows.
+  # TODO: integrate auth later
+servers:
+  - url: http://localhost:8000
+paths:
+  /api/analyze:
+    post:
+      summary: Analyze resume content against a job description
+      responses:
+        '200':
+          description: Analyze result payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyzeResponse'
+  /api/rewrite:
+    post:
+      summary: Rewrite a resume bullet with JD context
+      responses:
+        '200':
+          description: Rewrite result payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewriteResponse'
+components:
+  schemas:
+    AnalyzeGap:
+      type: object
+      required:
+        - skill
+        - reason
+      properties:
+        skill:
+          type: string
+        reason:
+          type: string
+    AnalyzeEvidence:
+      type: object
+      required:
+        - resumeText
+        - jdText
+      properties:
+        resumeText:
+          type: string
+        jdText:
+          type: string
+    AnalyzeResponse:
+      type: object
+      required:
+        - score
+        - gaps
+        - evidence
+        - bullets
+      properties:
+        score:
+          type: number
+        gaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyzeGap'
+        evidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnalyzeEvidence'
+        bullets:
+          type: array
+          items:
+            type: string
+    RewriteResponse:
+      type: object
+      required:
+        - original
+        - revised
+        - rationale
+      properties:
+        original:
+          type: string
+        revised:
+          type: string
+        rationale:
+          type: string
