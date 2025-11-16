@@ -214,4 +214,3 @@ if bullets_to_rewrite:
 else:
     st.info("Add at least one bullet point to rewrite.")
 
-st.caption("Gemini-Powered • Local Key • Bullet Editor Always Available")
