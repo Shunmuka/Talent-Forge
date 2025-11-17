@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Request
 from fastapi.responses import JSONResponse
 from typing import Optional
 
@@ -16,7 +16,7 @@ router = APIRouter()
 
 @router.post("/api/analyze", response_model=AnalyzeResponse)
 async def analyze_resume(
-    request: Optional[AnalyzeRequest] = None,
+    request: Request,
     resume_file: Optional[UploadFile] = File(None),
     resume_text: Optional[str] = Form(None),
     job_description: Optional[str] = Form(None),
@@ -25,8 +25,10 @@ async def analyze_resume(
     Analyze resume against job description.
     Accepts either JSON body or FormData with file upload.
     """
-    # Handle FormData (file upload or form text)
-    if resume_file is not None or resume_text is not None or job_description is not None:
+    content_type = request.headers.get("content-type", "")
+    
+    # Handle FormData (multipart/form-data)
+    if "multipart/form-data" in content_type:
         # Extract resume text from file or form
         if resume_file:
             try:
@@ -46,19 +48,22 @@ async def analyze_resume(
         jd_text = clean_text(job_description)
     
     # Handle JSON body
-    elif request:
-        if request.resumeFileId:
+    else:
+        try:
+            body = await request.json()
+            analyze_request = AnalyzeRequest(**body)
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Invalid JSON: {str(e)}")
+        
+        if analyze_request.resumeFileId:
             # TODO: Load from database when file storage is implemented
             raise HTTPException(status_code=501, detail="File ID lookup not yet implemented")
         
-        if not request.resumeText:
+        if not analyze_request.resumeText:
             raise HTTPException(status_code=400, detail="resumeText is required")
         
-        resume_content = clean_text(request.resumeText)
-        jd_text = clean_text(request.jobDescription)
-    
-    else:
-        raise HTTPException(status_code=400, detail="Request body or form data required")
+        resume_content = clean_text(analyze_request.resumeText)
+        jd_text = clean_text(analyze_request.jobDescription)
     
     # Validate inputs
     if not resume_content or len(resume_content) < 10:
@@ -105,8 +110,9 @@ async def analyze_resume_upload(
 ) -> AnalyzeResponse:
     """
     Analyze resume against job description (Form data with file upload).
+    Alternative endpoint for file uploads.
     """
-    # Extract resume text
+    # Extract resume text from file or form
     if resume_file:
         try:
             resume_content = extract_text_from_file(resume_file)
