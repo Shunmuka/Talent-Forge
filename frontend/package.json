@@ -1,14 +1,33 @@
 {
   "name": "talent-forge-frontend",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "echo \"TODO: start Next dev server\"",
-    "build": "echo \"TODO: build frontend\"",
-    "start": "echo \"TODO: run production server\"",
-    "lint": "echo \"TODO: lint frontend\"",
-    "typecheck": "echo \"TODO: run TypeScript checks\"",
-    "test": "echo \"TODO: add unit tests\"",
-    "msw": "echo \"TODO: start MSW worker\""
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:unit": "jest"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@tanstack/react-query": "^5.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.2.0",
+    "tailwindcss": "^3.3.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.52.0",
+    "eslint-config-next": "^14.0.0",
+    "@playwright/test": "^1.40.0",
+    "msw": "^2.0.0"
   }
 }
