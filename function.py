@@ -5,7 +5,7 @@ import PyPDF2
 import docx
 import re
 
-# === YOUR GEMINI API KEY (EDIT THIS LINE ONLY) ===
+
 GEMINI_API_KEY = "AIzaSyBYPhIsuGYXzMRiYrFi7yw6M2bH3EB4TFA"
 
 if not GEMINI_API_KEY or GEMINI_API_KEY == "your-gemini-api-key-here":
@@ -15,18 +15,22 @@ if not GEMINI_API_KEY or GEMINI_API_KEY == "your-gemini-api-key-here":
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-# === LOAD EMBEDDER ===
+
+
 @st.cache_resource
 def load_embedder():
     return SentenceTransformer('all-MiniLM-L6-v2')
 
 embedder = load_embedder()
 
-# === CONFIG ===
+
+
 st.set_page_config(page_title="Resume Matcher", layout="wide")
 st.title("Resume to Job Matcher")
 
-# === TEXT EXTRACTION ===
+
+
+
 def extract_text(file):
     if file.type == "application/pdf":
         reader = PyPDF2.PdfReader(file)
@@ -59,27 +63,48 @@ def compute_match_score(resume, job):
     sim = util.cos_sim(r_emb, j_emb)[0][0].item()
     return round(sim * 100, 1)
 
-# === GEMINI: GAP ANALYSIS ===
+
 def analyze_gaps(resume, job_desc):
     prompt = f"""
-    Compare resume and job description. List 3–5 critical missing hard skills, tools, or experience in ONE sentence each.
-    Format: - Missing: [sentence]
-
+    You are a resume expert. Compare the resume and job description below.
+    
+    Identify 3-5 critical gaps where the resume is missing important skills, tools, technologies, certifications, or experience mentioned in the job description.
+    
+    Format your response as a bulleted list with each gap on its own line starting with a dash or bullet point.
+    Be specific and concise - one clear sentence per gap.
+    
     Resume:
     {resume[:3000]}
 
-    Job:
+    Job Description:
     {job_desc[:3000]}
     """
     try:
         response = model.generate_content(prompt)
-        lines = response.text.strip().split('\n')
-        gaps = [line.replace('- Missing:', '').strip() for line in lines if '- Missing:' in line]
-        return gaps[:5] or ["No major gaps."]
+        text = response.text.strip()
+        
+        # Split into lines and extract bullets
+        lines = text.split('\n')
+        gaps = []
+        
+        for line in lines:
+            line = line.strip()
+            # Look for lines starting with bullet markers or dashes
+            if line and (line.startswith('-') or line.startswith('•') or line.startswith('*')):
+                # Remove the bullet marker and clean up
+                clean_line = re.sub(r'^[-•*]\s*', '', line).strip()
+                if len(clean_line) > 10:  # Make sure it's substantial
+                    gaps.append(clean_line)
+        
+        # If no bullets found, try to extract any meaningful lines
+        if not gaps:
+            gaps = [line.strip() for line in lines if line.strip() and len(line.strip()) > 20]
+        
+        return gaps[:5] if gaps else ["Unable to identify specific gaps. Consider reviewing job requirements manually."]
     except Exception as e:
-        return [f"Error: {str(e)}"]
+        return [f"Error analyzing gaps: {str(e)}"]
 
-# === GEMINI: REWRITE BULLET ===
+
 def rewrite_bullet(bullet, job_desc):
     prompt = f"""
     Rewrite this bullet to better match the job. Use strong action verbs, mirror job language, keep under 120 characters.
@@ -96,7 +121,7 @@ def rewrite_bullet(bullet, job_desc):
     except:
         return f"Improved: {bullet}"
 
-# === UI: INPUTS ===
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -116,7 +141,7 @@ with col2:
     st.subheader("Job Description")
     job_desc = st.text_area("Paste the job description here", height=250, key="job_desc")
 
-# === VALIDATION ===
+
 if not resume_text.strip():
     st.info("Please provide your resume (upload or paste).")
     st.stop()
@@ -127,10 +152,10 @@ if not job_desc.strip():
 resume_clean = clean_text(resume_text)
 job_clean = clean_text(job_desc)
 
-# === AUTO-EXTRACT BULLETS ===
+
 auto_bullets = extract_bullets(resume_clean)
 
-# === ALWAYS SHOW BULLET EDITOR ===
+
 st.markdown("---")
 st.subheader("✏️ Edit & Rewrite Bullet Points")
 
@@ -139,7 +164,7 @@ Enter or edit your resume bullet points below.
 We'll rewrite them to **perfectly match the job**.
 """)
 
-# Initialize session state for bullets
+
 if 'user_bullets' not in st.session_state:
     st.session_state.user_bullets = auto_bullets or [""] * 5
 
@@ -185,7 +210,7 @@ if st.button("🔍 Analyze Match & Gaps", type="primary"):
         for gap in gaps:
             st.markdown(f"• {gap}")
 
-# === REWRITE BULLETS BUTTON (Always Available) ===
+
 if bullets_to_rewrite:
     if st.button("✨ Rewrite Bullets to Match Job", type="secondary"):
         with st.spinner(f"Rewriting {len(bullets_to_rewrite)} bullets..."):
@@ -213,4 +238,3 @@ if bullets_to_rewrite:
         )
 else:
     st.info("Add at least one bullet point to rewrite.")
-
