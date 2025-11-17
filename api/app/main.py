@@ -2,7 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import analyze, rewrite
-from .database import init_db
+
+# Database import is optional for MVP
+try:
+    from .database import init_db
+except ImportError:
+    init_db = None
 
 app = FastAPI(
     title="Talent Forge API",
@@ -23,8 +28,9 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """Initialize database on startup."""
-    # init_db()  # Uncomment when database is ready
-    pass
+    if init_db:
+        # init_db()  # Uncomment when database is ready
+        pass
 
 
 @app.get("/healthz")

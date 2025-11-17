@@ -10,7 +10,7 @@ class AnalyzeRequest(BaseModel):
     jobDescription: str = Field(..., description="Job description text", min_length=10)
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "resumeText": "Software Engineer with 5 years of experience...",
                 "jobDescription": "We are looking for a Senior Software Engineer..."

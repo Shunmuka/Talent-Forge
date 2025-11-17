@@ -9,7 +9,7 @@ class RewriteRequest(BaseModel):
     context: Optional[str] = Field(None, description="Optional context (e.g., full resume or job description)")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "original": "Worked on software projects",
                 "context": "Full resume text or job description for context"
