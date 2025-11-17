@@ -6,7 +6,7 @@ import docx
 import re
 
 # === YOUR GEMINI API KEY (EDIT THIS LINE ONLY) ===
-GEMINI_API_KEY = "AIzaSyDlt5DrlIdBdeT7Uma6LzRPlFtInmcBQMY"
+GEMINI_API_KEY = "AIzaSyBYPhIsuGYXzMRiYrFi7yw6M2bH3EB4TFA"
 
 if not GEMINI_API_KEY or GEMINI_API_KEY == "your-gemini-api-key-here":
     st.error("Please set your Gemini API key in the code (line 9).")
