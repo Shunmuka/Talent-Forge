@@ -63,6 +63,7 @@ export async function analyzeWithFile(
   const response = await fetch(url, {
     method: "POST",
     body: formData,
+    // Don't set Content-Type header - browser will set it automatically with boundary for FormData
   });
 
   if (!response.ok) {
