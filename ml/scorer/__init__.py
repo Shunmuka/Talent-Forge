@@ -136,8 +136,37 @@ def analyze_gaps(resume: str, job_description: str, max_gaps: int = 10) -> List[
         List of gap dictionaries with 'skill' and 'reason' keys
     """
     if not _gemini_model:
-        # Fallback if Gemini not configured
-        return [{"skill": "API Configuration", "reason": "Gemini API key not configured"}]
+        # Fallback if Gemini not configured - use simple keyword-based analysis
+        # Extract key terms from JD that might be missing
+        jd_lower = job_description.lower()
+        resume_lower = resume.lower()
+        
+        # Common tech skills to check
+        common_skills = [
+            "python", "javascript", "react", "node.js", "aws", "docker", 
+            "kubernetes", "sql", "postgresql", "mongodb", "graphql", 
+            "typescript", "java", "go", "rust", "terraform", "ci/cd"
+        ]
+        
+        missing_skills = []
+        for skill in common_skills:
+            if skill in jd_lower and skill not in resume_lower:
+                missing_skills.append(skill.title())
+        
+        if missing_skills:
+            return [
+                {
+                    "skill": skill,
+                    "reason": f"Job requires {skill} but it's not mentioned in your resume"
+                }
+                for skill in missing_skills[:max_gaps]
+            ]
+        
+        # If no obvious gaps found, return a helpful message
+        return [{
+            "skill": "Configuration Note",
+            "reason": "Gemini API key not configured. Add GEMINI_API_KEY to .env for AI-powered gap analysis. Basic keyword matching used instead."
+        }]
     
     resume_clean = clean_text(resume)[:3000]  # Limit input size
     jd_clean = clean_text(job_description)[:3000]
