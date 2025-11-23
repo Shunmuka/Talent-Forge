@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer, util
 import torch
 
 # Initialize Gemini model
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY = "AIzaSyDlt5DrlIdBdeT7Uma6LzRPlFtInmcBQMY"
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
     _gemini_model = genai.GenerativeModel("gemini-2.5-flash")
